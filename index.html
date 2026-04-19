@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bitoria Tech | Telegram Booking Bot</title>
+  <meta name="description" content="Smart Telegram booking bot for salons and service businesses. Manage appointments, stylists, services, and reminders with simple monthly plans." />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: rgba(255,255,255,0.06);
+      --panel-strong: rgba(255,255,255,0.1);
+      --text: #edf2ff;
+      --muted: #aeb8d0;
+      --line: rgba(255,255,255,0.12);
+      --brand: #7c9cff;
+      --brand-2: #6cf0c2;
+      --accent: #ffd166;
+      --shadow: 0 20px 50px rgba(0,0,0,0.28);
+      --radius: 22px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(124,156,255,0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(108,240,194,0.14), transparent 20%),
+        linear-gradient(180deg, #0a0f1d 0%, #0f1630 55%, #0b1020 100%);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .container {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      background: rgba(11,16,32,0.7);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      min-height: 76px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-badge {
+      width: 40px;
+      height: 40px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 14px;
+      color: #0b1020;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      box-shadow: var(--shadow);
+      font-weight: 900;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 22px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 50px;
+      padding: 0 22px;
+      border-radius: 999px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+      cursor: pointer;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      color: #0b1020;
+      background: linear-gradient(135deg, var(--brand-2), var(--brand));
+      box-shadow: 0 14px 30px rgba(124,156,255,0.28);
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .hero {
+      padding: 72px 0 40px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 34px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--brand-2);
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(38px, 5vw, 68px);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p.lead {
+      font-size: 19px;
+      color: var(--muted);
+      margin: 22px 0 28px;
+      max-width: 660px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .mini-note {
+      color: #d8def0;
+      font-size: 14px;
+    }
+
+    .hero-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: auto -40px -60px auto;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(124,156,255,0.24), transparent 60%);
+      pointer-events: none;
+    }
+
+    .demo-window {
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #0b1227;
+    }
+
+    .demo-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.35); }
+    .demo-body { padding: 18px; display: grid; gap: 12px; }
+
+    .chat-row {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 15px;
+    }
+
+    .chat-row.user {
+      margin-left: 36px;
+      background: linear-gradient(135deg, rgba(124,156,255,0.24), rgba(108,240,194,0.18));
+    }
+
+    .kbd-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .kbd {
+      padding: 10px 12px;
+      border-radius: 14px;
+      text-align: center;
+      font-size: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #f4f7ff;
+    }
+
+    section { padding: 42px 0; }
+    .section-head { max-width: 740px; margin-bottom: 24px; }
+    .section-head h2 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 3vw, 42px);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .section-head p { margin: 0; color: var(--muted); font-size: 17px; }
+
+    .grid-3, .grid-4, .pricing-grid, .steps, .faq-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .pricing-grid { grid-template-columns: repeat(2, 1fr); align-items: stretch; }
+    .steps { grid-template-columns: repeat(3, 1fr); }
+    .faq-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h3 { margin: 0 0 10px; font-size: 20px; }
+    .card p { margin: 0; color: var(--muted); }
+
+    .icon {
+      width: 46px;
+      height: 46px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, rgba(124,156,255,0.22), rgba(108,240,194,0.22));
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 22px;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .pill {
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #ebf2ff;
+      font-weight: 600;
+    }
+
+    .pricing-card {
+      position: relative;
+      padding: 28px;
+    }
+
+    .pricing-card.popular {
+      background: linear-gradient(180deg, rgba(124,156,255,0.16), rgba(255,255,255,0.06));
+      border-color: rgba(124,156,255,0.35);
+      transform: translateY(-4px);
+    }
+
+    .tag {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 209, 102, 0.14);
+      color: var(--accent);
+      border: 1px solid rgba(255, 209, 102, 0.3);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+
+    .price {
+      display: flex;
+      align-items: end;
+      gap: 8px;
+      margin: 12px 0 6px;
+    }
+
+    .price strong {
+      font-size: 46px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .price span { color: var(--muted); font-weight: 700; }
+
+    ul.feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 18px 0 24px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .feature-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: #f1f5ff;
+    }
+
+    .feature-list li::before {
+      content: "✓";
+      color: var(--brand-2);
+      font-weight: 900;
+      margin-top: 1px;
+    }
+
+    .setup-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      padding: 26px 28px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.05));
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: var(--shadow);
+    }
+
+    .setup-strip strong { font-size: 30px; letter-spacing: -0.03em; }
+    .setup-strip p { margin: 6px 0 0; color: var(--muted); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: var(--shadow);
+      background: rgba(255,255,255,0.04);
+    }
+
+    th, td {
+      padding: 18px 18px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    th {
+      color: #f5f7ff;
+      background: rgba(255,255,255,0.05);
+      font-size: 15px;
+    }
+
+    td { color: var(--muted); }
+    tr:last-child td { border-bottom: none; }
+
+    .step-num {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: inline-grid;
+      place-items: center;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #0b1020;
+      margin-bottom: 12px;
+    }
+
+    .proof {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .stat {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 26px;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .faq-item h3 { font-size: 18px; margin-bottom: 8px; }
+    .faq-item p { color: var(--muted); }
+
+    .cta {
+      padding: 30px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(124,156,255,0.18), rgba(108,240,194,0.14));
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .cta h2 { margin: 0 0 10px; font-size: clamp(30px, 4vw, 50px); letter-spacing: -0.03em; }
+    .cta p { max-width: 720px; margin: 0 auto 22px; color: #d8def0; font-size: 18px; }
+
+    footer {
+      padding: 28px 0 50px;
+      color: var(--muted);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .hero-grid, .proof { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .pricing-grid, .steps, .faq-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr; }
+      .setup-strip { flex-direction: column; align-items: flex-start; }
+      .nav-links { display: none; }
+    }
+
+    @media (max-width: 720px) {
+      .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .nav-inner { min-height: 70px; }
+      .nav-actions .btn-secondary { display: none; }
+      .hero { padding-top: 40px; }
+      .container { width: min(var(--max), calc(100% - 20px)); }
+      .btn { width: 100%; }
+      .hero-actions { flex-direction: column; }
+      .price strong { font-size: 40px; }
+      th, td { padding: 14px 12px; font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="#top" class="brand">
+        <span class="brand-badge">B</span>
+        <span>Bitoria Tech</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#how">How It Works</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="btn btn-secondary" href="#pricing">See Plans</a>
+        <a class="btn btn-primary" href="#contact">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Telegram Booking Bot for Service Businesses</div>
+          <h1>Turn Telegram into your booking assistant.</h1>
+          <p class="lead">
+            A smart booking system for salons and service businesses. Manage appointments, stylists, services, reminders, and admins in one simple Telegram bot.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#contact">Start Your Bot</a>
+            <a class="btn btn-secondary" href="#pricing">View Pricing</a>
+          </div>
+          <div class="mini-note">One-time setup fee. Simple monthly plans. 24/7 support included in every plan.</div>
+        </div>
+
+        <div class="hero-card">
+          <div class="demo-window">
+            <div class="demo-top">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+            <div class="demo-body">
+              <div class="chat-row">Welcome to your booking bot. Please choose a service.</div>
+              <div class="kbd-grid">
+                <div class="kbd">Hair</div>
+                <div class="kbd">Nails</div>
+                <div class="kbd">Lashes</div>
+                <div class="kbd">Facial</div>
+              </div>
+              <div class="chat-row user">I want to book a nail appointment for tomorrow.</div>
+              <div class="chat-row">Great. Choose your stylist and time.</div>
+              <div class="kbd-grid">
+                <div class="kbd">10:00 AM</div>
+                <div class="kbd">12:00 PM</div>
+                <div class="kbd">2:00 PM</div>
+                <div class="kbd">4:00 PM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2>A simple booking solution for modern businesses</h2>
+          <p>
+            Bitoria Tech helps businesses manage appointments directly inside Telegram. Customers can book easily, and owners can manage services, stylists, admins, and reminders without a complicated system.
+          </p>
+        </div>
+        <div class="pill-list">
+          <div class="pill">Beauty Salons</div>
+          <div class="pill">Nail Studios</div>
+          <div class="pill">Hair Stylists</div>
+          <div class="pill">Lash Artists</div>
+          <div class="pill">Barbershops</div>
+          <div class="pill">Clinics</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2>Why businesses choose this bot</h2>
+          <p>People do not just buy features. They buy a smoother workflow, fewer mistakes, and a better customer experience.</p>
+        </div>
+        <div class="grid-4">
+          <article class="card">
+            <div class="icon">⏱️</div>
+            <h3>Save time</h3>
+            <p>Reduce manual booking work and handle appointments faster every day.</p>
+          </article>
+          <article class="card">
+            <div class="icon">🗂️</div>
+            <h3>Stay organized</h3>
+            <p>Keep bookings, services, staff, and reminders in one clean system.</p>
+          </article>
+          <article class="card">
+            <div class="icon">💬</div>
+            <h3>Improve customer experience</h3>
+            <p>Make booking easy for customers and keep them informed automatically.</p>
+          </article>
+          <article class="card">
+            <div class="icon">📈</div>
+            <h3>Grow with confidence</h3>
+            <p>Start small with Basic and upgrade to Pro whenever your business needs more.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="container">
+        <div class="section-head">
+          <h2>Everything you need to manage bookings</h2>
+          <p>Built for real service businesses that want a practical system, not extra complexity.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card">
+            <div class="icon">📅</div>
+            <h3>Appointment booking</h3>
+            <p>Customers can book services directly in Telegram with a simple button-based flow.</p>
+          </article>
+          <article class="card">
+            <div class="icon">🧑‍💼</div>
+            <h3>Admin control</h3>
+            <p>Manage services, stylists, admins, and schedules from an organized admin panel.</p>
+          </article>
+          <article class="card">
+            <div class="icon">🔔</div>
+            <h3>Automatic reminders</h3>
+            <p>Reduce missed appointments with 24-hour reminders and optional morning reminders.</p>
+          </article>
+          <article class="card">
+            <div class="icon">🛠️</div>
+            <h3>Easy setup</h3>
+            <p>Your bot is created, configured, and launched for you with a one-time setup fee.</p>
+          </article>
+          <article class="card">
+            <div class="icon">🌐</div>
+            <h3>Server deployment</h3>
+            <p>The bot is installed on a server so it stays available for your business.</p>
+          </article>
+          <article class="card">
+            <div class="icon">🫶</div>
+            <h3>Ongoing support</h3>
+            <p>All monthly plans include 24/7 support, so help is available whenever you need it.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing">
+      <div class="container">
+        <div class="section-head">
+          <h2>Simple pricing for every business</h2>
+          <p>Choose the plan that fits your business today. Upgrade later whenever you need more flexibility.</p>
+        </div>
+
+        <div class="pricing-grid">
+          <article class="card pricing-card">
+            <h3>Basic Plan</h3>
+            <p>Perfect for small businesses that want a clean and simple booking system.</p>
+            <div class="price"><strong>$19.99</strong><span>/month</span></div>
+            <ul class="feature-list">
+              <li>Up to 2 stylists</li>
+              <li>Up to 5 services</li>
+              <li>1 admin</li>
+              <li>24-hour reminder before each appointment</li>
+              <li>24/7 ongoing support</li>
+            </ul>
+            <a class="btn btn-secondary" href="#contact">Choose Basic</a>
+          </article>
+
+          <article class="card pricing-card popular">
+            <div class="tag">Most Popular</div>
+            <h3>Pro Plan</h3>
+            <p>Best for growing businesses that need more flexibility and better control.</p>
+            <div class="price"><strong>$34.99</strong><span>/month</span></div>
+            <ul class="feature-list">
+              <li>Everything in Basic</li>
+              <li>Unlimited services</li>
+              <li>Unlimited stylists</li>
+              <li>Unlimited admins</li>
+              <li>Morning reminder on the appointment day</li>
+              <li>24-hour reminder before each appointment</li>
+              <li>24/7 ongoing support</li>
+            </ul>
+            <a class="btn btn-primary" href="#contact">Choose Pro</a>
+          </article>
+        </div>
+
+        <div style="height:18px"></div>
+
+        <div class="setup-strip">
+          <div>
+            <strong>One-time setup fee — $50</strong>
+            <p>Includes bot creation, server setup, and launch configuration.</p>
+          </div>
+          <a class="btn btn-secondary" href="#contact">Ask About Setup</a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2>Compare the plans clearly</h2>
+          <p>This makes the buying decision easier and helps customers see why Pro gives them more long-term value.</p>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Basic</th>
+              <th>Pro</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Telegram booking system</td>
+              <td>Yes</td>
+              <td>Yes</td>
+            </tr>
+            <tr>
+              <td>Stylists</td>
+              <td>Up to 2</td>
+              <td>Unlimited</td>
+            </tr>
+            <tr>
+              <td>Services</td>
+              <td>Up to 5</td>
+              <td>Unlimited</td>
+            </tr>
+            <tr>
+              <td>Admins</td>
+              <td>1</td>
+              <td>Unlimited</td>
+            </tr>
+            <tr>
+              <td>24-hour reminder</td>
+              <td>Yes</td>
+              <td>Yes</td>
+            </tr>
+            <tr>
+              <td>Morning reminder</td>
+              <td>No</td>
+              <td>Yes</td>
+            </tr>
+            <tr>
+              <td>24/7 support</td>
+              <td>Yes</td>
+              <td>Yes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="container">
+        <div class="section-head">
+          <h2>Get started in 3 simple steps</h2>
+          <p>The process is designed to feel easy for the customer from day one.</p>
+        </div>
+        <div class="steps">
+          <article class="card">
+            <div class="step-num">1</div>
+            <h3>We set up your bot</h3>
+            <p>We create and configure the Telegram booking bot for your business needs.</p>
+          </article>
+          <article class="card">
+            <div class="step-num">2</div>
+            <h3>We launch it on the server</h3>
+            <p>Your bot is installed and prepared for real business use.</p>
+          </article>
+          <article class="card">
+            <div class="step-num">3</div>
+            <h3>You start taking bookings</h3>
+            <p>Manage appointments, services, staff, and reminders in one simple system.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container proof">
+        <article class="card">
+          <div class="section-head" style="margin-bottom:0; max-width:none;">
+            <h2>Built for real business needs</h2>
+            <p>
+              This booking system is designed for service businesses that want something practical, easy to manage, and professional enough for daily use.
+            </p>
+          </div>
+          <div class="stats">
+            <div class="stat">
+              <strong>Simple</strong>
+              <span>Easy for both customers and admins</span>
+            </div>
+            <div class="stat">
+              <strong>Flexible</strong>
+              <span>Works for small teams and growing businesses</span>
+            </div>
+            <div class="stat">
+              <strong>Supported</strong>
+              <span>24/7 ongoing support included in all plans</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="section-head" style="margin-bottom: 14px; max-width:none;">
+            <h2>Smart selling points</h2>
+            <p>These messages help customers feel the value quickly.</p>
+          </div>
+          <ul class="feature-list" style="margin:0;">
+            <li>Simple booking. Better management.</li>
+            <li>Built for modern service businesses.</li>
+            <li>Save time and stay organized.</li>
+            <li>Turn Telegram into your booking assistant.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="container">
+        <div class="section-head">
+          <h2>Frequently asked questions</h2>
+          <p>A short FAQ reduces hesitation and answers the questions many buyers already have in mind.</p>
+        </div>
+        <div class="faq-grid">
+          <article class="card faq-item">
+            <h3>Do I need technical knowledge to use the bot?</h3>
+            <p>No. The bot is designed to be simple and easy to use for everyday business tasks.</p>
+          </article>
+          <article class="card faq-item">
+            <h3>Is support included?</h3>
+            <p>Yes. All monthly plans include ongoing 24/7 support.</p>
+          </article>
+          <article class="card faq-item">
+            <h3>Is there a setup fee?</h3>
+            <p>Yes. A one-time $50 setup fee applies to all new accounts.</p>
+          </article>
+          <article class="card faq-item">
+            <h3>Can I upgrade later?</h3>
+            <p>Yes. You can move from Basic to Pro whenever your business needs more services, stylists, or admins.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="container">
+        <div class="cta">
+          <h2>Start managing bookings the smarter way</h2>
+          <p>Choose your plan and turn Telegram into a simple booking system for your business. Fast setup, clean pricing, and ongoing support included.</p>
+          <div class="hero-actions" style="justify-content:center; margin-bottom: 0;">
+            <a class="btn btn-primary" href="https://t.me/yourusername" target="_blank" rel="noopener noreferrer">Contact on Telegram</a>
+            <a class="btn btn-secondary" href="mailto:hello@bitoria.tech">Email Us</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div>
+        <strong style="color:#edf2ff;">Bitoria Tech</strong><br />
+        Software, websites, and smart bots for modern businesses.
+      </div>
+      <div>© 2026 Bitoria Tech. All rights reserved.</div>
+    </div>
+  </footer>
+</body>
+</html>
