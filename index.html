@@ -470,7 +470,13 @@
       border-top: 1px solid rgba(255,255,255,0.08);
       padding-top: 24px;
     }
-
+    
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      display: block;
+    }
     @media (max-width: 1024px) {
       .hero-grid, .proof { grid-template-columns: 1fr; }
       .grid-4 { grid-template-columns: repeat(2, 1fr); }
@@ -497,7 +503,10 @@
   <header class="nav">
     <div class="container nav-inner">
       <a href="#top" class="brand">
-        <span class="brand-badge"><img src="assets/images/logo.png" alt="Bitoria Tech Logo" class="logo"></span>
+        <a href="#top" class="brand">
+          <img src="assets/images/logo.png" alt="Bitoria Tech Logo" class="brand-logo">
+          <span>Bitoria Tech</span>
+        </a>
         <span>Bitoria Tech</span>
       </a>
       <nav class="nav-links">
